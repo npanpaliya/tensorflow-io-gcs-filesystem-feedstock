@@ -13,7 +13,8 @@ source:
     - 0104-Fix-another-error-with-headers-not-found.patch
     - 0105-Boringssl-fixed-for-GCC-11.patch    #[c_compiler_version == "11.2.*"]
     - 0106-fix-for-py310.patch
-
+ #   - 0107-Updated-zlib.patch
+    - 0108-Fixed-upb.patch
     - 0301-Updated-protobuf-to-3.19.patch
     - 0302-Fix-libwebp-linking-errors.patch
 
@@ -58,10 +59,12 @@ outputs:
       run:
         - python {{ python }}
         - numpy {{ numpy }}
+        - tensorflow-io-gcs-filesystem {{ build_version }}
 
 test:
   requires:
     - tensorflow-base {{ tensorflow }}
+    - tensorflow-io-gcs-filesystem {{ build_version }}
   imports:
     - tensorflow_io_gcs_filesystem
     - tensorflow_io

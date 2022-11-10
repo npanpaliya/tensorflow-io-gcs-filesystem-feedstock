@@ -1,0 +1,97 @@
+From 5a61b66f64effbd8ba23d47be5b0e9541627611b Mon Sep 17 00:00:00 2001
+From: Nishidha Panpaliya <npanpa23@in.ibm.com>
+Date: Thu, 10 Nov 2022 06:22:08 +0000
+Subject: [PATCH] Fixed upb
+
+---
+ WORKSPACE                   | 12 +++++++++
+ third_party/upb_gcc10.patch | 54 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
+ create mode 100644 third_party/upb_gcc10.patch
+
+diff --git a/WORKSPACE b/WORKSPACE
+index ed06afb9..1fd65ae9 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -15,6 +15,18 @@ http_archive(
+     ],
+ )
+ 
++http_archive(
++    name = "upb",
++    sha256 = "61d0417abd60e65ed589c9deee7c124fe76a4106831f6ad39464e1525cef1454",
++    strip_prefix = "upb-9effcbcb27f0a665f9f345030188c0b291e32482",
++    patch_args = ["-p1"],
++    urls = [
++        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/protocolbuffers/upb/archive/9effcbcb27f0a665f9f345030188c0b291e32482.tar.gz",
++        "https://github.com/protocolbuffers/upb/archive/9effcbcb27f0a665f9f345030188c0b291e32482.tar.gz",
++    ],
++    patches = ["//third_party:upb_gcc10.patch"],
++)
++
+ # Note: snappy is placed earlier as tensorflow's snappy does not include snappy-c
+ http_archive(
+     name = "snappy",
+diff --git a/third_party/upb_gcc10.patch b/third_party/upb_gcc10.patch
+new file mode 100644
+index 00000000..7d747c48
+--- /dev/null
++++ b/third_party/upb_gcc10.patch
+@@ -0,0 +1,54 @@
++From 57028552ed072263cd6656e5feed67ff89a55e43 Mon Sep 17 00:00:00 2001
++From: Nishidha Panpaliya <npanpa23@in.ibm.com>
++Date: Mon, 7 Mar 2022 15:08:33 +0000
++Subject: [PATCH] Fix for build failure with GCC10
++
++---
++ upb/upb.c | 17 +++--------------
++ 1 file changed, 3 insertions(+), 14 deletions(-)
++
++diff --git a/upb/upb.c b/upb/upb.c
++index 266ea7d..1410b2d 100644
++--- a/upb/upb.c
+++++ b/upb/upb.c
++@@ -11,17 +11,6 @@
++ 
++ #include "upb/port_def.inc"
++ 
++-/* Guarantee null-termination and provide ellipsis truncation.
++- * It may be tempting to "optimize" this by initializing these final
++- * four bytes up-front and then being careful never to overwrite them,
++- * this is safer and simpler. */
++-static void nullz(upb_status *status) {
++-  const char *ellipsis = "...";
++-  size_t len = strlen(ellipsis);
++-  UPB_ASSERT(sizeof(status->msg) > len);
++-  memcpy(status->msg + sizeof(status->msg) - len, ellipsis, len);
++-}
++-
++ /* upb_status *****************************************************************/
++ 
++ void upb_status_clear(upb_status *status) {
++@@ -37,8 +26,8 @@ const char *upb_status_errmsg(const upb_status *status) { return status->msg; }
++ void upb_status_seterrmsg(upb_status *status, const char *msg) {
++   if (!status) return;
++   status->ok = false;
++-  strncpy(status->msg, msg, sizeof(status->msg));
++-  nullz(status);
+++  strncpy(status->msg, msg, UPB_STATUS_MAX_MESSAGE - 1);
+++  status->msg[UPB_STATUS_MAX_MESSAGE - 1] = '\0';
++ }
++ 
++ void upb_status_seterrf(upb_status *status, const char *fmt, ...) {
++@@ -52,7 +41,7 @@ void upb_status_vseterrf(upb_status *status, const char *fmt, va_list args) {
++   if (!status) return;
++   status->ok = false;
++   _upb_vsnprintf(status->msg, sizeof(status->msg), fmt, args);
++-  nullz(status);
+++  status->msg[UPB_STATUS_MAX_MESSAGE - 1] = '\0';
++ }
++ 
++ /* upb_alloc ******************************************************************/
++-- 
++2.34.1
++
+-- 
+2.34.1
+

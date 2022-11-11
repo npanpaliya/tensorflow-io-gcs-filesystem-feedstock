@@ -1,4 +1,4 @@
-{% set build_version = "0.26.0" %}
+{% set build_version = "0.27.0" %}
 
 package:
   name: tensorflow-io-gcs-filesystem
@@ -10,19 +10,23 @@ source:
   patches:
     # 01xx - patch is specific to open-ce and will always be carried forward and not upstreamed
     - 0101-Build-fixed-on-ppc.patch            #[ppc64le]
-    - 0102-Removed-aws_checksum_cpu_id-redefinition.patch
+    - 0102-Removed-aws_checksum_cpu_id-redefinition.patch  #[ppc64le]
     - 0104-Fix-another-error-with-headers-not-found.patch
     - 0105-Boringssl-fixed-for-GCC-11.patch    #[c_compiler_version == "11.2.*"]
     - 0106-fix-for-py310.patch
+    - 0301-Updated-protobuf-to-3.19.patch
+    - 0302-Fix-libwebp-linking-errors.patch
+    - 0001-Don-t-exclude-tf-io-gcs-filesystem.patch
 
 build:
-  number: 3
+  number: 1
   string: h{{ PKG_HASH }}_py{{ python | replace(".", "") }}_pb{{ protobuf | replace(".*", "")}}_{{ PKG_BUILDNUM }}
 
 requirements:
   build:
     - {{ compiler('c') }}      # [ ppc_arch != "p10"]
     - {{ compiler('cxx') }}    # [ ppc_arch != "p10"]
+    - tensorflow-base {{ tensorflow }}
   host:
     - git >=2.2
     - bazel {{ bazel }}
@@ -30,9 +34,19 @@ requirements:
     - python {{ python }}
     - numpy {{ numpy }}
     - tensorflow-base {{ tensorflow }}
+    - keras {{ keras }}
+    - tensorflow-estimator {{ tensorflow }}
+    - tensorboard {{ tensorboard }}
   run:
     - python {{ python }}
     - numpy {{ numpy }}
+
+test:
+  requires:
+    - tensorflow-base {{ tensorflow }}
+  imports:
+    - tensorflow_io
+    - tensorflow_io_gcs_filesystem
 
 about:
   home: http://tensorflow.org/
@@ -50,7 +64,7 @@ test:
   requires:
     - tensorflow-base {{ tensorflow }}
   commands:
-    - export TF_USE_MODULAR_FILESYSTEM=1; python -c "import tensorflow_io_gcs_filesystem as tfio;"
+    - export TF_USE_MODULAR_FILESYSTEM=1; python -c "import tensorflow_io_gcs_filesystem as tfio; import tensorflow_io"
 
 extra:
   recipe-maintainers:

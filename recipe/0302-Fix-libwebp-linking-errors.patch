@@ -1,0 +1,28 @@
+From a45e9e72058245cf6202576366d494361e3ed3c9 Mon Sep 17 00:00:00 2001
+From: Nishidha Panpaliya <npanpa23@in.ibm.com>
+Date: Tue, 1 Nov 2022 12:58:14 +0000
+Subject: [PATCH] Fix libwebp linking errors
+
+---
+ third_party/libwebp.BUILD | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/third_party/libwebp.BUILD b/third_party/libwebp.BUILD
+index 4dea61e3..825d9e0a 100644
+--- a/third_party/libwebp.BUILD
++++ b/third_party/libwebp.BUILD
+@@ -28,9 +28,9 @@ cc_library(
+         "imageio/imageio_util.h",
+         "examples/unicode.h",
+     ],
+-    defines = [
+-        "WEBP_EXTERN=",
+-    ],
++    #defines = [
++    #    "WEBP_EXTERN=",
++    #],
+     includes = [
+         "src",
+     ],
+-- 
+2.34.1

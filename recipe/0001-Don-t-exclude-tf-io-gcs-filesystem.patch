@@ -1,0 +1,27 @@
+From adba9cc2ce40dc70c128709367eae8d3d278c09c Mon Sep 17 00:00:00 2001
+From: Nishidha Panpaliya <npanpa23@in.ibm.com>
+Date: Thu, 10 Nov 2022 12:50:57 +0000
+Subject: [PATCH] Don't exclude tf-io-gcs-filesystem
+
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 38803015..8f8a6742 100644
+--- a/setup.py
++++ b/setup.py
+@@ -58,8 +58,8 @@ project = project.replace("_", "-")
+ 
+ exclude = (
+     ["tests", "tests.*"]
+-    + [e.replace("-", "_") for e in subpackages if e != project]
+-    + ["{}.*".format(e.replace("-", "_")) for e in subpackages if e != project]
++#    + [e.replace("-", "_") for e in subpackages if e != project]
++#    + ["{}.*".format(e.replace("-", "_")) for e in subpackages if e != project]
+     + (["tensorflow_io", "tensorflow_io.*"] if project != "tensorflow-io" else [])
+ )
+ project_rootpath = project.replace("-", "_")
+-- 
+2.34.1
+

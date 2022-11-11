@@ -1,0 +1,33 @@
+From 2be372224aabb16d5fc8893d3db2013ef2a6ce53 Mon Sep 17 00:00:00 2001
+From: Nishidha Panpaliya <npanpa23@in.ibm.com>
+Date: Tue, 1 Nov 2022 11:04:50 +0000
+Subject: [PATCH] Updated protobuf to 3.19
+
+---
+ WORKSPACE | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/WORKSPACE b/WORKSPACE
+index d82a1233..3a4b3b24 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -113,6 +113,16 @@ load("@lint_dependencies//:requirements.bzl", "pip_install")
+
+ pip_install()
+
++http_archive(
++    name = "com_google_protobuf",
++    #patches = ["//third_party:protobuf.patch"],
++    sha256 = "25f1292d4ea6666f460a2a30038eef121e6c3937ae0f61d610611dfb14b0bd32",
++    strip_prefix = "protobuf-3.19.1",
++    urls = [
++        "https://github.com/protocolbuffers/protobuf/archive/v3.19.1.zip",
++    ]
++)
++
+ http_archive(
+     name = "org_tensorflow",
+     sha256 = "b5a1bb04c84b6fe1538377e5a1f649bb5d5f0b2e3625a3c526ff3a8af88633e8",
+-- 
+2.34.1
+

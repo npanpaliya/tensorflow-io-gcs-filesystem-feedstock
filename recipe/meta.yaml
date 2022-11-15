@@ -40,10 +40,12 @@ requirements:
   run:
     - python {{ python }}
     - numpy {{ numpy }}
+    - tensorflow-base {{ tensorflow }}
+    - keras {{ keras }}
+    - tensorflow-estimator {{ tensorflow }}
+    - tensorboard {{ tensorboard }}
 
 test:
-  requires:
-    - tensorflow-base {{ tensorflow }}
   imports:
     - tensorflow_io
     - tensorflow_io_gcs_filesystem

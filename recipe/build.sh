@@ -23,14 +23,18 @@ bazel shutdown
 # Build Tensorflow from source
 SCRIPT_DIR=$RECIPE_DIR/../buildscripts
 
+sh ${SRC_DIR}/configure.sh
+
+export LD_LIBRARY_PATH=$LD_LIBRAY_PATH:$PREFIX/lib:$BUILD_PREFIX/lib
+
 # Pick up additional variables defined from the conda build environment
 $SCRIPT_DIR/set_python_path_for_bazelrc.sh $SRC_DIR
 
-sh ${SRC_DIR}/configure.sh
+cat $SRC_DIR/.bazelrc
 
 # install using pip from the whl file
-bazel --bazelrc=$SRC_DIR/python_configure.bazelrc build \
-      --verbose_failures $BAZEL_OPTIMIZATION //tensorflow_io/... //tensorflow_io_gcs_filesystem/...
+bazel --bazelrc=$SRC_DIR/.bazelrc build -s \
+      --verbose_failures $BAZEL_OPTIMIZATION -- //tensorflow_io/... //tensorflow_io_gcs_filesystem/...
 
 if [ $? -eq 0 ];
 then
@@ -40,6 +44,7 @@ else
     bazel clean --expunge
     bazel shutdown
 fi
+
 $PYTHON setup.py bdist_wheel --data bazel-bin
 $PYTHON setup.py bdist_wheel --data bazel-bin --project tensorflow-io-gcs-filesystem
 $PYTHON -m pip install dist/*.whl
